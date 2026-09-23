@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Security Lab</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 70px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 20px #00000015;
+        }
+
+        .status {
+            color: #16a34a;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 14px 25px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 25px;
+            font-size: 18px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Computer Security Laboratory</h1>
+    <p>Local Web Server Availability Experiment</p>
+</header>
+
+<main>
+    <div class="card">
+
+        <h1>Welcome to Our Website</h1>
+
+        <p class="status" id="status">
+            SERVER ONLINE
+        </p>
+
+        <p>
+            This website is hosted using a C++ HTTP server.
+        </p>
+
+        <button onclick="checkServer()">
+            Check Server
+        </button>
+
+        <p id="result">
+            Click the button to test server availability.
+        </p>
+
+    </div>
+</main>
+
+<script>
+
+async function checkServer() {
+
+    if (window.checkInProgress) {
+        return;
+    }
+
+    window.checkInProgress = true;
+
+    const result = document.getElementById("result");
+    const status = document.getElementById("status");
+
+    result.innerText = "Checking...";
+
+    const start = performance.now();
+
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+        controller.abort();
+    }, 4000);
+
+    try {
+
+        const response = await fetch(
+            "/health?t=" + Date.now(),
+            {
+                signal: controller.signal,
+                cache: "no-store"
+            }
+        );
+
+        const elapsed = Math.round(
+            performance.now() - start
+        );
+
+        if (response.ok) {
+
+            status.innerText = "SERVER ONLINE";
+            status.style.color = "green";
+
+            result.innerText =
+                "Server responded in " + elapsed + " ms";
+
+        } else {
+
+            status.innerText = "SERVER OVERLOADED";
+            status.style.color = "red";
+
+            result.innerText =
+                "HTTP Error: " + response.status;
+
+        }
+
+    } catch (error) {
+
+        status.innerText = "SERVER UNAVAILABLE";
+        status.style.color = "red";
+
+        result.innerText =
+            "Request failed or timed out.";
+
+    } finally {
+
+        clearTimeout(timeout);
+
+        window.checkInProgress = false;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

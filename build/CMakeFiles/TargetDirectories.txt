@@ -1,0 +1,4 @@
+D:/Programming/dos-simulation/build/CMakeFiles/server.dir
+D:/Programming/dos-simulation/build/CMakeFiles/client.dir
+D:/Programming/dos-simulation/build/CMakeFiles/edit_cache.dir
+D:/Programming/dos-simulation/build/CMakeFiles/rebuild_cache.dir
